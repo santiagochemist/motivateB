@@ -1,0 +1,36 @@
+name: Manual Sync Repo B → Repo A
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: "Source branch (Repo B)"
+        required: true
+        default: "main"
+      target_branch:
+        description: "Target branch (Repo A)"
+        required: true
+        default: "main"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_branch }}
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Push to Repo A
+        run: |
+          git remote add repoA https://x-access-token:${{ secrets.REPO_A_TOKEN }}@github.com/<ORG_OR_USER>/repo-a.git
+          git push repoA \
+            "${{ inputs.source_branch }}:${{ inputs.target_branch }}" \
+            --force
