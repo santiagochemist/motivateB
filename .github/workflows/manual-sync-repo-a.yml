@@ -38,6 +38,11 @@ jobs:
       - name: Test PAT authentication
         run: |
           git ls-remote https://x-access-token:${{ secrets.REPO_A_TOKEN }}@github.com/santiagochemist/motivateA.git
+
+      - name: Debug remote URL
+        run: |
+          echo "Remote URL: https://x-access-token:${{ secrets.REPO_A_TOKEN }}@github.com/santiagochemist/motivateA.git"
+
           
       # 4️⃣ Configure Git
       - name: Configure Git
