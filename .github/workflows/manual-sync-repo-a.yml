@@ -4,11 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       source_branch:
-        description: "Source branch (Repo B)"
         required: true
         default: "main"
       target_branch:
-        description: "Target branch (Repo A)"
         required: true
         default: "main"
 
@@ -17,20 +15,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source branch from Repo B
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.source_branch }}
           fetch-depth: 0
+
+      - name: Debug secret presence
+        run: |
+          if [ -z "${{ secrets.REPO_A_TOKEN }}" ]; then
+            echo "❌ REPO_A_TOKEN is EMPTY"
+            exit 1
+          else
+            echo "✅ REPO_A_TOKEN is PRESENT"
+          fi
 
       - name: Configure Git
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-      - name: Push selected branch to Repo A
+      - name: Push to Repo A
         run: |
           git remote add repoA https://x-access-token:${{ secrets.REPO_A_TOKEN }}@github.com/santiagochemist/motivateA.git
-          git push repoA \
-            "${{ inputs.source_branch }}:${{ inputs.target_branch }}" \
-            --force
+          git push repoA "${{ inputs.source_branch }}:${{ inputs.target_branch }}" --force
