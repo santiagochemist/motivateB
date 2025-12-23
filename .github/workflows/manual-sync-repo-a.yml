@@ -30,7 +30,7 @@ jobs:
 
       - name: Push to Repo A
         run: |
-          git remote add repoA https://x-access-token:${{ secrets.REPO_A_TOKEN }}@github.com/santiagochemist/motivateA.git
+          git remote add repoA https://github.com/santiagochemist/motivateA.git
           git push repoA \
             "${{ inputs.source_branch }}:${{ inputs.target_branch }}" \
             --force
