@@ -16,11 +16,8 @@ jobs:
   sync:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write   # <-- THIS IS CRITICAL
-
     steps:
-      - name: Checkout source branch
+      - name: Checkout source branch from Repo B
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.source_branch }}
@@ -31,9 +28,9 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-      - name: Push to Repo A
+      - name: Push selected branch to Repo A
         run: |
-          git remote add repoA https://x-access-token:${{ github.token }}@github.com/santiagochemist/motivateA.git
+          git remote add repoA https://x-access-token:${{ secrets.REPO_A_TOKEN }}@github.com/santiagochemist/motivateA.git
           git push repoA \
             "${{ inputs.source_branch }}:${{ inputs.target_branch }}" \
             --force
