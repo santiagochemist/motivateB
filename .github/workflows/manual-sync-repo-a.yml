@@ -4,11 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       source_branch:
-        description: "Source branch in Repo B"
         required: true
         default: "main"
       target_branch:
-        description: "Target branch in Repo A"
         required: true
         default: "main"
 
@@ -17,14 +15,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout the selected branch from Repo B
       - name: Checkout source branch
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.source_branch }}
           fetch-depth: 0
+          persist-credentials: false   # 🔴 IMPORTANT
 
-      # 2️⃣ Debug: verify the secret is present
       - name: Verify PAT secret
         run: |
           if [ -z "${{ secrets.REPO_A_TOKEN }}" ]; then
@@ -34,24 +31,17 @@ jobs:
             echo "✅ REPO_A_TOKEN is PRESENT"
           fi
 
-      # 3️⃣ Debug: test PAT access to Repo A
       - name: Test PAT authentication
         run: |
           git ls-remote https://x-access-token:${{ secrets.REPO_A_TOKEN }}@github.com/santiagochemist/motivateA.git
 
-      - name: Debug remote URL
-        run: |
-          echo "Remote URL: https://x-access-token:${{ secrets.REPO_A_TOKEN }}@github.com/santiagochemist/motivateA.git"
-
-          
-      # 4️⃣ Configure Git
       - name: Configure Git
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-      # 5️⃣ Push the selected branch to Repo A (authenticated)
-      - name: Push to Repo A
+      - name: Push to Repo A (FORCED AUTH)
         run: |
-          git remote add repoA https://x-access-token:${{ secrets.REPO_A_TOKEN }}@github.com/santiagochemist/motivateA.git
-          git push repoA "${{ inputs.source_branch }}:${{ inputs.target_branch }}" --force
+          git push https://x-access-token:${{ secrets.REPO_A_TOKEN }}@github.com/santiagochemist/motivateA.git \
+            "${{ inputs.source_branch }}:${{ inputs.target_branch }}" \
+            --force
